@@ -42,7 +42,7 @@ class main_api
     }
     return $constantValue;
   }
-  public function extends($className, $classDir){
+  public function _extends($className, $classDir){
     $attr = array();
     $attr["className"] = $className;
     $attr["classDir"] = $classDir;
