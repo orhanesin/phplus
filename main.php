@@ -14,31 +14,38 @@ class main_api
   private $public_directory = "";
   private $extends = array();
   private $constants = array();
+  private $values = array();
 
   function __construct($dir)
   {
-    // code...
+     
     $this->public_directory = $dir;
   }
+    public function setValue($name, $value){
+        $this->values[$name] = $value;
+    }
+    public function getValue($name){
+        return $this->values[$name];
+    }
   public function setConstant($name, $value)
   {
     $attr = array();
     $attr["name"] = $name;
     $attr["value"] = $value;
-    // code...
+     
 
-    $this->constants[] = $attr;
+    $this->constants[$name] = $value;
   }
   public function getConstant($name)
   {
-    // code...
+     
     $constantValue = "";
     foreach ($this->constants as $key => $value) {
       if($value["name"] == $name){
         $constantValue = $value["value"];
         break;
       }
-      // code...
+       
     }
     return $constantValue;
   }
@@ -46,7 +53,7 @@ class main_api
     $attr = array();
     $attr["className"] = $className;
     $attr["classDir"] = $classDir;
-    // code...
+     
 
     $this->extends[] = $attr;
   }
@@ -54,7 +61,7 @@ class main_api
     $className = "";
     $classDir = "";
     foreach ($this->extends as $key => $value) {
-      // code...
+       
       if($value["className"] == $name){
         $className = $value["className"];
         $classDir = $value["classDir"];
@@ -73,7 +80,7 @@ class main_api
     $attr = array();
     $attr["name"] = $name;
     $attr["value"] = $value;
-    // code...
+     
 
     $this->htmlAttr[] = $attr;
   }
@@ -86,10 +93,10 @@ class main_api
     $attr = array();
     $attr["name"] = $name;
     $attr["value"] = $value;
-    // code...
+     
     $i = -1;
     foreach ($this->header as $key => $value) {
-      // code...
+       
       if($name == $value["name"]){
         $i = $key;
         break;
@@ -109,23 +116,22 @@ class main_api
     $attr = array();
     $attr["name"] = $name;
     $attr["value"] = $value;
-    // code...
+     
 
     $this->bodyAttr[] = $attr;
   }
   private function getBodyAttr()
   {
-    // code...
+     
     return $this->bodyAttr;
   }
   //**************************************
   public function setFooter($name, $value)
   {
-    // code...
+     
     $attr = array();
     $attr["name"] = $name;
     $attr["value"] = $value;
-    // code...
 
     $this->footer[] = $attr;
   }
@@ -135,11 +141,9 @@ class main_api
   //**************************************
   public function setThemplate_parts($name, $value)
   {
-    // code...
     $attr = array();
     $attr["name"] = $name;
     $attr["value"] = $value;
-    // code...
 
     $this->themplate_parts[] = $attr;
   }
@@ -150,12 +154,9 @@ class main_api
   //*****************************************
   public function setHeaderThemplateParts($name, $value)
   {
-    // code...
-    // code...
     $attr = array();
     $attr["name"] = $name;
     $attr["value"] = $value;
-    // code...
 
     $this->headerThemplateParts[] = $attr;
   }
@@ -165,17 +166,14 @@ class main_api
   //*******************************************
   public function setFooterThemplateParts($name, $value)
   {
-    // code...
     $attr = array();
     $attr["name"] = $name;
     $attr["value"] = $value;
-    // code...
 
     $this->footerThemplateParts[] = $attr;
   }
   private function getFooterThemplateParts()
   {
-    // code...
     return $this->footerThemplateParts;
   }
 
@@ -186,27 +184,23 @@ class main_api
     ob_start();
 
     $this->includeThemplateParts();
-
     $contents = ob_get_contents();
     ob_end_clean();
-    // code...
     echo  $this->getHtmlTag();
-
     echo "<head>";
-    echo  $this->getHeaderincludes();
+    echo  $this->sanitize_output($this->getHeaderincludes());
     echo  $this->includeHeaderThemplateParts();
     echo "</head>";
     echo  $this->getBodyTag();
-          print $contents;
-    echo  $this->getFooterincludes();
+          print $this->sanitize_output($contents);
+    echo  $this->sanitize_output($this->getFooterincludes());
     echo  $this->includeFooterThemplateParts();
-echo "</body></html>";
+    echo "</body></html>";
   }
   //**************************************
   private function getHtmlTag(){
     $attrs_html = "";
     foreach ($this->getHtmlAttr() as $key => $value) {
-      // code...
       $attrs_html .= $value["name"].'='.'"'.$value["value"].'" ';
     }
     $html_tag = "<!DOCTYPE html><html ".$attrs_html.">";
@@ -216,7 +210,6 @@ echo "</body></html>";
 
     $headervalues = "";
     foreach ($this->getHeader() as $key => $value) {
-      // code...
       $headervalues .= $value["value"];
     }
 
@@ -225,7 +218,6 @@ echo "</body></html>";
   private function getBodyTag(){
     $attr_body = "";
     foreach ($this->getBodyAttr() as $key => $value) {
-      // code...
       $attr_body .= $value["name"].'='.'"'.$value["value"].'" ';
     }
     $body_tag = "<body ".$attr_body.">";
@@ -235,31 +227,27 @@ echo "</body></html>";
   {
 
     foreach ($this->themplate_parts as $key => $value) {
-      // code...
       include_once($this->public_directory."/".$value["value"]);
     }
-    // code...
   }
   private function includeHeaderThemplateParts()
   {
-    // code...
     foreach ($this->headerThemplateParts as $key => $value) {
-      // code...
-      include_once($this->public_directory."/".$value["value"]);
+        $contents = file_get_contents($this->public_directory."/".$value["value"]);
+        print $this->sanitize_output($contents);
     }
   }
   private function includeFooterThemplateParts()
   {
-    // code...
     foreach ($this->footerThemplateParts as $key => $value) {
-      // code...
-      include_once($this->public_directory."/".$value["value"]);
+     $contents = file_get_contents($this->public_directory."/".$value["value"]);
+        print $this->sanitize_output($contents);
+        
     }
   }
   private function getFooterincludes(){
     $footervalues = "";
     foreach ($this->footer as $key => $value) {
-      // code...
 
       $footervalues .= $value["value"];
     }
@@ -268,5 +256,29 @@ echo "</body></html>";
   private function get_themplate_part($dir){
     include_once($this->public_directory."/".$dir);
   }
+
+    function sanitize_output($buffer) {
+
+    $search = array(
+        '/\>[^\S ]+/s',     // strip whitespaces after tags, except space
+        '/[^\S ]+\</s',     // strip whitespaces before tags, except space
+        '/(\s)+/s',         // shorten multiple whitespace sequences
+        '/<!--(.|\s)*?-->/' // Remove HTML comments
+    );
+          
+
+    $replace = array(
+        '>',
+        '<',
+        '\\1',
+        ''
+    );
+    $buffer = preg_replace('/(?<=;)\s+\/\/[^\n]+/m', '', $buffer);
+    $buffer = preg_replace($search, $replace, $buffer);
+    $buffer = preg_replace('/\s+\/\/[^\n]+/m', '', $buffer);
+        
+    return $buffer;
+}
+   
 
 }
