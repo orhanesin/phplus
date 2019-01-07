@@ -17,6 +17,7 @@ Firstly include main.php file in index.php and create new $api
 call dirname where ever your api should work
 
 Now you can set your default settings or your repositories for your web site before starting development
+
 *for setting <html {...attributes}> (optional)*
 
     $api->setHtmlAttr("lang","en"); 
